@@ -1,0 +1,10 @@
+.block_mymail_courses,
+.block_mymail_labels {
+    margin-left: 1em;
+}
+
+.block_mymail_count {
+    vertical-align: middle;
+    font-weight: bold;
+    margin-left: 0.5em;
+}
