@@ -20,9 +20,10 @@
  * My mail block
  *
  *
- * @package   blocks
- * @author    Marc Català <mcatala@ioc.cat>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    block
+ * @subpackage mymail
+ * @author     Marc Català <mcatala@ioc.cat>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require_once($CFG->dirroot . '/local/mail/message.class.php');
@@ -135,7 +136,7 @@ class block_mymail extends block_base {
      * @return array
      */
     public function applicable_formats() {
-        return array('my-index'=>true);
+        return array('my-index' => true);
     }
 
     public function instance_can_be_docked() {
