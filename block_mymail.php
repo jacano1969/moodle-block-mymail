@@ -55,66 +55,99 @@ class block_mymail extends block_base {
 
         $count = local_mail_message::count_menu($USER->id);
 
-        $content = '';
+        //Compose
+        $content = $OUTPUT->container_start('compose');
+        $url = new moodle_url('/local/mail/create.php');
+        $name = html_writer::tag('span', get_string('compose', 'block_mymail'));
+        $content .= html_writer::link($url, $name);
+        $content .= $OUTPUT->container_end();
+        //Inbox
+        $content .= $OUTPUT->container_start('block_mymail_inbox');
+        $params = array('t' => 'inbox');
+        $url = new moodle_url('/local/mail/view.php', $params);
+        $name = html_writer::tag('span', get_string('inbox', 'block_mymail'));;
+        $content .= html_writer::link($url, $name);
         if (!empty($count->inbox)) {
-            $content .= $OUTPUT->container_start('block_mymail_inbox');
-            $params = array('t' => 'inbox');
-            $url = new moodle_url('/local/mail/view.php', $params);
-            $name = html_writer::tag('span', get_string('inbox', 'block_mymail'));;
-            $counter = html_writer::tag('span', '(' . $count->inbox . ')', array('class' => 'block_mymail_count'));
-            $content .= html_writer::link($url, $name);
-            $content .= $counter;
-            $content .= $OUTPUT->container_end('inbox');
-            $courses = enrol_get_my_courses();
-            $text = '';
-            foreach ($courses as $course) {
-                if (!empty($count->courses[$course->id])) {
-                    $params = array('t' => 'course', 'c' => $course->id);
-                    $url = new moodle_url('/local/mail/view.php', $params);
-                    $text .= html_writer::start_tag('div', array('class' => 'block_mymail_course'));
-                    $name = html_writer::tag('span', $course->shortname);
-                    $counter = html_writer::tag('span', '(' . $count->courses[$course->id] . ')', array('class' => 'block_mymail_count'));
-                    $text .= html_writer::link($url, $name);
-                    $text .= $counter;
-                    $text .= html_writer::end_tag('div');
-                }
-            }
-            if (!empty($text)) {
-                $content .= $OUTPUT->container_start('courses');
-                $content .= $OUTPUT->heading(get_string('courses', 'block_mymail'), 3);
-                $content .= $OUTPUT->container_start('block_mymail_courses');
-                $content .= $text;
-                $content .= $OUTPUT->container_end('block_mymail_courses');
-                $content .= $OUTPUT->container_end('courses');
-            }
-
-            $labels = local_mail_label::fetch_user($USER->id);
-            $text = '';
-            if ($labels) {
-                foreach ($labels as $label) {
-                    if (!empty($count->labels[$label->id()])) {
-                        $params = array('t' => 'label', 'l' => $label->id());
-                        $url = new moodle_url('/local/mail/view.php', $params);
-                        $name = html_writer::tag('span', $label->name());
-                        $counter = html_writer::tag('span', '(' . $count->labels[$label->id()] . ')', array('class' => 'block_mymail_count'));
-                        $text .= html_writer::start_tag('div', array('class' => 'block_mymail_label'));
-                        $text .= html_writer::link($url, $name);
-                        $text .= $counter;
-                        $text .= html_writer::end_tag('div');
-                    }
-                }
-            }
-            if (!empty($text)) {
-                $content .= $OUTPUT->container_start('labels');
-                $content .= $OUTPUT->heading(get_string('labels', 'block_mymail'), 3);
-                $content .= $OUTPUT->container_start('block_mymail_labels');
-                $content .= $text;
-                $content .= $OUTPUT->container_end('block_mymail_labels');
-                $content .= $OUTPUT->container_end('labels');
-            }
-        } else {
-            $content = get_string('nonewmessages', 'block_mymail');
+            $content .= html_writer::tag('span', '(' . $count->inbox . ')', array('class' => 'block_mymail_count'));
         }
+        $content .= $OUTPUT->container_end();
+        //Starred
+        $content .= $OUTPUT->container_start('starred');
+        $params = array('t' => 'starred');
+        $url = new moodle_url('/local/mail/view.php', $params);
+        $name = html_writer::tag('span', get_string('starred', 'block_mymail'));
+        $content .= html_writer::link($url, $name);
+        $content .= $OUTPUT->container_end();
+        //Drafts
+        $content .= $OUTPUT->container_start('drafts');
+        $params = array('t' => 'drafts');
+        $url = new moodle_url('/local/mail/view.php', $params);
+        $name = html_writer::tag('span', get_string('drafts', 'block_mymail'));
+        $content .= html_writer::link($url, $name);
+        if (!empty($count->drafts)) {
+            $content .= html_writer::tag('span', '(' . $count->drafts . ')', array('class' => 'block_mymail_count'));
+        }
+        $content .= $OUTPUT->container_end();
+        //Sent
+        $content .= $OUTPUT->container_start('sent');
+        $params = array('t' => 'sent');
+        $url = new moodle_url('/local/mail/view.php', $params);
+        $name = html_writer::tag('span', get_string('sentmail', 'block_mymail'));
+        $content .= html_writer::link($url, $name);
+        $content .= $OUTPUT->container_end();
+        //Courses
+        $courses = enrol_get_my_courses();
+        $text = '';
+        foreach ($courses as $course) {
+            $params = array('t' => 'course', 'c' => $course->id);
+            $url = new moodle_url('/local/mail/view.php', $params);
+            $text .= html_writer::start_tag('div', array('class' => 'block_mymail_course'));
+            $name = html_writer::tag('span', $course->shortname);
+            $text .= html_writer::link($url, $name);
+            if (!empty($count->courses[$course->id])) {
+                $text .= html_writer::tag('span', '(' . $count->courses[$course->id] . ')', array('class' => 'block_mymail_count'));
+            }
+            $text .= html_writer::end_tag('div');
+        }
+        if (!empty($text)) {
+            $content .= $OUTPUT->container_start('courses');
+            $content .= $OUTPUT->heading(get_string('courses', 'block_mymail'), 3);
+            $content .= $OUTPUT->container_start('block_mymail_courses');
+            $content .= $text;
+            $content .= $OUTPUT->container_end('block_mymail_courses');
+            $content .= $OUTPUT->container_end('courses');
+        }
+
+        $labels = local_mail_label::fetch_user($USER->id);
+        $text = '';
+        if ($labels) {
+            foreach ($labels as $label) {
+                $params = array('t' => 'label', 'l' => $label->id());
+                $url = new moodle_url('/local/mail/view.php', $params);
+                $name = html_writer::tag('span', $label->name());
+                $text .= html_writer::start_tag('div', array('class' => 'block_mymail_label'));
+                $text .= html_writer::link($url, $name);
+                if (!empty($count->labels[$label->id()])) {
+                    $text .= html_writer::tag('span', '(' . $count->labels[$label->id()] . ')', array('class' => 'block_mymail_count'));
+                }
+                $text .= html_writer::end_tag('div');
+            }
+        }
+        if (!empty($text)) {
+            $content .= $OUTPUT->container_start('labels');
+            $content .= $OUTPUT->heading(get_string('labels', 'block_mymail'), 3);
+            $content .= $OUTPUT->container_start('block_mymail_labels');
+            $content .= $text;
+            $content .= $OUTPUT->container_end('block_mymail_labels');
+            $content .= $OUTPUT->container_end('labels');
+        }
+        //Trash
+        $content .= $OUTPUT->container_start('trash');
+        $params = array('t' => 'trash');
+        $url = new moodle_url('/local/mail/view.php', $params);
+        $name = html_writer::tag('span', get_string('trash', 'block_mymail'));
+        $content .= html_writer::link($url, $name);
+        $content .= $OUTPUT->container_end();
 
         $this->content->text = $content;
 
