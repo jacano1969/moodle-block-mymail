@@ -8,3 +8,5 @@ $string['pluginname'] = 'El meu correu';
 $string['sentmail'] = 'Enviats';
 $string['starred'] = 'Destacat';
 $string['trash'] = 'Paperera';
+$string['mymail:addinstance'] = 'Afegeix un nou bloc El meu correu';
+$string['mymail:myaddinstance'] = 'Afegeix un nou bloc El meu correu a La meva pàgina inicial';
